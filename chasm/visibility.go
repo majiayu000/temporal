@@ -52,6 +52,15 @@ type VisibilitySearchAttributesMapper struct {
 	systemAliasToField map[string]string
 }
 
+func NewVisibilitySearchAttributesMapper() *VisibilitySearchAttributesMapper {
+	return &VisibilitySearchAttributesMapper{
+		aliasToField:       make(map[string]string),
+		fieldToAlias:       make(map[string]string),
+		saTypeMap:          make(map[string]enumspb.IndexedValueType),
+		systemAliasToField: make(map[string]string),
+	}
+}
+
 // Alias returns the alias for a given field.
 func (v *VisibilitySearchAttributesMapper) Alias(field string) (string, error) {
 	if v == nil {

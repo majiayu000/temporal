@@ -75,15 +75,11 @@ func WithBusinessIDAlias(
 ) RegistrableComponentOption {
 	return func(rc *RegistrableComponent) {
 		if rc.searchAttributesMapper == nil {
-			rc.searchAttributesMapper = &VisibilitySearchAttributesMapper{
-				aliasToField:       make(map[string]string),
-				fieldToAlias:       make(map[string]string),
-				saTypeMap:          make(map[string]enumspb.IndexedValueType),
-				systemAliasToField: make(map[string]string),
-			}
+			rc.searchAttributesMapper = NewVisibilitySearchAttributesMapper()
 		}
-		if rc.searchAttributesMapper.systemAliasToField == nil {
-			rc.searchAttributesMapper.systemAliasToField = make(map[string]string)
+		if !sadefs.IsMappable(alias) {
+			//nolint:forbidigo
+			panic(fmt.Sprintf("registrable component validation error: business ID alias %q is a system or reserved search attribute", alias))
 		}
 		if _, ok := rc.searchAttributesMapper.aliasToField[alias]; ok {
 			//nolint:forbidigo
@@ -91,7 +87,7 @@ func WithBusinessIDAlias(
 		}
 		if _, ok := rc.searchAttributesMapper.systemAliasToField[alias]; ok {
 			//nolint:forbidigo
-			panic(fmt.Sprintf("registrable component validation error: business ID alias %q is already defined as a system search attribute", alias))
+			panic(fmt.Sprintf("registrable component validation error: business ID alias %q is already defined as a search attribute", alias))
 		}
 		rc.searchAttributesMapper.systemAliasToField[alias] = sadefs.WorkflowID
 		rc.searchAttributesMapper.fieldToAlias[sadefs.WorkflowID] = alias
@@ -108,12 +104,7 @@ func WithSearchAttributes(
 		}
 
 		if rc.searchAttributesMapper == nil {
-			rc.searchAttributesMapper = &VisibilitySearchAttributesMapper{
-				aliasToField:       make(map[string]string, len(searchAttributes)),
-				fieldToAlias:       make(map[string]string, len(searchAttributes)),
-				saTypeMap:          make(map[string]enumspb.IndexedValueType, len(searchAttributes)),
-				systemAliasToField: make(map[string]string),
-			}
+			rc.searchAttributesMapper = NewVisibilitySearchAttributesMapper()
 		}
 
 		for _, sa := range searchAttributes {
@@ -121,14 +112,14 @@ func WithSearchAttributes(
 			field := sa.definition().field
 			valueType := sa.definition().valueType
 
-			if sadefs.IsSystem(alias) || sadefs.IsReserved(alias) {
+			if !sadefs.IsMappable(alias) {
 				//nolint:forbidigo
-				panic(fmt.Sprintf("registrable component validation error: CHASM search attribute alias %q is a system or reserved search attribute", alias))
+				panic(fmt.Sprintf("registrable component validation error: search attribute alias %q is a system or reserved search attribute", alias))
 			}
 
 			if _, ok := rc.searchAttributesMapper.systemAliasToField[alias]; ok {
 				//nolint:forbidigo
-				panic(fmt.Sprintf("registrable component validation error: CHASM search attribute alias %q is already defined as a system search attribute alias", alias))
+				panic(fmt.Sprintf("registrable component validation error: search attribute alias %q is already defined as a system search attribute alias", alias))
 			}
 			if _, ok := rc.searchAttributesMapper.aliasToField[alias]; ok {
 				//nolint:forbidigo

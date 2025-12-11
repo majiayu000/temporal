@@ -70,10 +70,6 @@ var (
 	SearchAttributeTemporalWorkerDeploymentVersion    = newSearchAttributeKeywordByField(sadefs.TemporalWorkerDeploymentVersion)
 	SearchAttributeTemporalWorkflowVersioningBehavior = newSearchAttributeKeywordByField(sadefs.TemporalWorkflowVersioningBehavior)
 	SearchAttributeTemporalWorkerDeployment           = newSearchAttributeKeywordByField(sadefs.TemporalWorkerDeployment)
-
-	// SearchAttributeBusinessIDField is a search attribute field mapping to underlying system search attribute WorkflowID.
-	// Used only with WithBusinessIDAlias option.
-	searchAttributeBusinessIDField = newSearchAttributeFieldKeywordByField(sadefs.WorkflowID)
 )
 
 var (
